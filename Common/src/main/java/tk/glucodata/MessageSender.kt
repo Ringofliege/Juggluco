@@ -263,6 +263,7 @@ companion object {
     const val BLUETOOTH_PATH = "/bluetooth"
     const val DATA_PATH = "/data"
     const val MESSAGES_PATH = "/messages"
+    const val STOPALARM_PATH = "/stopalarm"
     val scope = CoroutineScope(Dispatchers.IO+SupervisorJob()  )
     private var messagesender: MessageSender? = null
     @JvmStatic
@@ -296,6 +297,13 @@ companion object {
         val sender = messagesender ?: return
         val ar = byteArrayOf(0);
         sender.sendmessage(WAKESTREAM_PATH, ar)
+    }
+
+    @JvmStatic
+    public fun sendStopAlarm() {
+        val sender = messagesender ?: return
+        val ar = byteArrayOf(0);
+        sender.sendmessage(STOPALARM_PATH, ar)
     }
 
     @Keep

@@ -432,9 +432,11 @@ private static void showoldglucose() {
         }
         var runner=runstopalarm;
         if(runner!=null) {
-            if(!isWearable) {
-                if(send)
+            if(send) {
+                if(!isWearable) {
                     Applic.app.numdata.stopalarm();
+                    }
+                MessageSender.sendStopAlarm();
                 }
             runner.run();
         }

@@ -1434,6 +1434,7 @@ void showindialog(String message,boolean cancel) {
         if(!isWearable) {
             Applic.app.numdata.stopalarm();
             }
+        MessageSender.sendStopAlarm();
         }).setTitle("  ").setMessage(message).create();;
        dialog.setCanceledOnTouchOutside(false);
         dialog.setOnShowListener(a ->  {
