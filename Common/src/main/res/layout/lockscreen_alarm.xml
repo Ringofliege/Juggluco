@@ -52,8 +52,8 @@
             android:layout_height="wrap_content"
             android:text="@string/shortoff"
             android:textSize="24sp"
-            android:paddingLeft="48dp"
-            android:paddingRight="48dp"
+            android:paddingStart="48dp"
+            android:paddingEnd="48dp"
             android:paddingTop="16dp"
             android:paddingBottom="16dp" />
 
