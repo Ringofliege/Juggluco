@@ -269,6 +269,7 @@ static RemoteGlucose arrowNotify;
             NotificationChannel channel = new NotificationChannel(NUMALARM, NUMALARM, importance);
             channel.setSound(null, null);
             channel.setDescription(description);
+            channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
             // allowbubbel(channel);
             notificationManager.createNotificationChannel(channel);
 
@@ -277,6 +278,7 @@ static RemoteGlucose arrowNotify;
             channel = new NotificationChannel(GLUCOSEALARM,GLUCOSEALARM, importance);
             channel.setSound(null, null);
             channel.setDescription(description);
+            channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
             // allowbubbel(channel);
             notificationManager.createNotificationChannel(channel);
 
@@ -286,6 +288,7 @@ static RemoteGlucose arrowNotify;
             //allowbubbel(channel);
             channel.setSound(null, null);
             channel.setDescription(description);
+            channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
             notificationManager.createNotificationChannel(channel);
         }
 
@@ -774,6 +777,24 @@ private void setIcon( Notification.Builder GluNotBuilder,float glvalue,int senso
               GluNotBuilder.setSmallIcon(draw);
            }
        }
+static String rateToArrow(float rate) {
+    if (Float.isNaN(rate)) return "";
+    if (rate > 2.0f) return "\u2191\u2191"; // ↑↑
+    if (rate > 1.0f) return "\u2191";       // ↑
+    if (rate > 0.5f) return "\u2197";       // ↗
+    if (rate >= -0.5f) return "\u2192";     // →
+    if (rate >= -1.0f) return "\u2198";     // ↘
+    if (rate >= -2.0f) return "\u2193";     // ↓
+    return "\u2193\u2193";                  // ↓↓
+}
+private PendingIntent mkLockScreenAlarmIntent(String glucoseValue, float rate, String alarmMessage) {
+    Intent lockIntent = new Intent(Applic.app, LockScreenAlarmActivity.class);
+    lockIntent.putExtra(LockScreenAlarmActivity.EXTRA_GLUCOSE_VALUE, glucoseValue);
+    lockIntent.putExtra(LockScreenAlarmActivity.EXTRA_GLUCOSE_ARROW, rateToArrow(rate));
+    lockIntent.putExtra(LockScreenAlarmActivity.EXTRA_ALARM_MESSAGE, alarmMessage);
+    lockIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+    return PendingIntent.getActivity(Applic.app, 1, lockIntent, PendingIntent.FLAG_UPDATE_CURRENT | penmutable);
+}
 private void  makeseparatenotification(float glvalue,String message,notGlucose glucose,String type) {
     if(!isWearable) {
         if(alertseparate) {
@@ -797,6 +818,7 @@ private void  makeseparatenotification(float glvalue,String message,notGlucose g
             GluNotBuilder.setPriority(Notification.PRIORITY_HIGH);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 GluNotBuilder.setCategory(Notification.CATEGORY_ALARM);
+                GluNotBuilder.setFullScreenIntent(mkLockScreenAlarmIntent(glucose.value, glucose.rate, message), true);
                 } 
             Notification notif= GluNotBuilder.build();
             notif.when= glucose.time;
@@ -856,6 +878,9 @@ static public boolean alertseparate=false;
 //        GluNotBuilder.setPriority(Notification.PRIORITY_MAX);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             GluNotBuilder.setCategory(Notification.CATEGORY_ALARM);
+            if(!isWearable) {
+                GluNotBuilder.setFullScreenIntent(mkLockScreenAlarmIntent(glucose.value, glucose.rate, message), true);
+            }
         }
     }
 
