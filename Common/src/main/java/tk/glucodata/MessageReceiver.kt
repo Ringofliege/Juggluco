@@ -152,6 +152,10 @@ class MessageReceiver: WearableListenerService() {
                      Wearos.sendinitwatchapp(node);
                  }
                }
+             MessageSender.STOPALARM_PATH -> {
+                 if(doLog) {Log.i(LOG_ID,"received stopalarm from ${messageEvent.sourceNodeId}");}
+                 Notify.stopalarmnotsend(false)
+               }
         }
         Log.i(LOG_ID,"onMessageReceived end $path"  )
       }

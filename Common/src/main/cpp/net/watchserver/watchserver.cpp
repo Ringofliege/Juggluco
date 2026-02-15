@@ -780,6 +780,56 @@ class AddHost {
         return bufptr; 
         }
     };
+static bool givedashboard(recdata *outdata,std::string_view hostname,bool secure) {
+    static constexpr const char dashhead[]=R"(<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Juggluco Dashboard</title>)";
+    static constexpr const char dashbody[]=R"(
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,sans-serif;background:#1a1a2e;color:#e0e0e0;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px}
+h1{color:#00d2ff;margin-bottom:10px;font-size:1.5em}
+.card{background:#16213e;border-radius:12px;padding:20px;margin:10px 0;width:100%;max-width:600px;box-shadow:0 4px 6px rgba(0,0,0,.3)}
+.current{text-align:center;padding:30px}
+.glucose-val{font-size:4em;font-weight:bold;margin:10px 0}
+.direction{font-size:2em;margin-left:10px}
+.low{color:#ff6b6b}
+.normal{color:#51cf66}
+.high{color:#ffd43b}
+.very-high{color:#ff8c00}
+.time-ago{color:#868e96;font-size:1em;margin-top:5px}
+.unit{font-size:.4em;color:#868e96}
+table{width:100%;border-collapse:collapse;margin-top:10px}
+th{text-align:left;color:#00d2ff;padding:8px;border-bottom:2px solid #0f3460}
+td{padding:8px;border-bottom:1px solid #0f3460}
+.info{font-size:.9em;color:#868e96;text-align:center;margin-top:10px}
+.refresh-note{font-size:.8em;color:#555;text-align:center;margin:5px}
+</style>
+<h1>&#x1F4C8; Juggluco Dashboard</h1>
+<div class="card current" id="cur"><div class="glucose-val" id="gv">--</div><div class="time-ago" id="ta">Loading...</div></div>
+<div class="card"><h3 style="color:#00d2ff;margin-bottom:10px">Recent Readings</h3><table><thead><tr><th>Time</th><th>Value</th><th>Trend</th></tr></thead><tbody id="tb"></tbody></table></div>
+<div class="info">Auto-refreshes every 60 seconds</div>
+<div class="refresh-note" id="upd"></div>
+<script>
+var apiBase=location.protocol+'//'+location.host;
+function dirArrow(d){var m={'SingleUp':'\u2191','DoubleUp':'\u2191\u2191','SingleDown':'\u2193','DoubleDown':'\u2193\u2193','FortyFiveUp':'\u2197','FortyFiveDown':'\u2198','Flat':'\u2192','NOT COMPUTABLE':'-','RATE OUT OF RANGE':'-'};return m[d]||d||'-'}
+function cls(v){if(v<70)return'low';if(v<=180)return'normal';if(v<=250)return'high';return'very-high'}
+function ago(t){var s=Math.floor((Date.now()-t)/1000);if(s<60)return s+'s ago';if(s<3600)return Math.floor(s/60)+'m ago';return Math.floor(s/3600)+'h '+Math.floor((s%3600)/60)+'m ago'}
+function pad(n){return n<10?'0'+n:''+n}
+function fmt(d){return pad(d.getHours())+':'+pad(d.getMinutes())}
+function load(){
+fetch(apiBase+'/api/v1/entries/sgv.json?count=20').then(function(r){return r.json()}).then(function(data){
+if(!data||!data.length){document.getElementById('gv').textContent='No data';return}
+var e=data[0],v=e.sgv||e.glucose||0,d=new Date(e.date||e.mills);
+document.getElementById('gv').innerHTML='<span class="'+cls(v)+'">'+v+'</span><span class="direction '+cls(v)+'">'+dirArrow(e.direction)+'</span><span class="unit"> mg/dL</span>';
+document.getElementById('ta').textContent=ago(d.getTime())+' ('+fmt(d)+')';
+var tb=document.getElementById('tb');tb.innerHTML='';
+for(var i=0;i<data.length;i++){var r=data[i],rv=r.sgv||r.glucose||0,rd=new Date(r.date||r.mills);
+var tr=document.createElement('tr');tr.innerHTML='<td>'+fmt(rd)+'</td><td class="'+cls(rv)+'">'+rv+'</td><td>'+dirArrow(r.direction)+'</td>';tb.appendChild(tr)}
+document.getElementById('upd').textContent='Updated: '+new Date().toLocaleTimeString()
+}).catch(function(err){document.getElementById('gv').textContent='Connection Error';document.getElementById('ta').textContent=(err.message||'')+' Check that the web server is enabled in Juggluco and that this device is on the same network.'})}
+load();setInterval(load,60000);
+</script>)";
+    return mkhtml(outdata,"*"sv,std::string_view(dashhead,sizeof(dashhead)-1),std::string_view(dashbody,sizeof(dashbody)-1),true);
+   }
 static bool givesite(recdata *outdata,std::string_view hostname,bool secure) {
     static constexpr const char refresh[]{ R"(<meta http-equiv="refresh" content="0; url=https://www.juggluco.nl/Juggluco/webserver.html?urlstart=http)"};
     static constexpr const char endrefresh[]{ R"(">)"};
@@ -2462,6 +2512,10 @@ constexpr const std::string_view status="status.json";
    if(!memcmp(status.data(),toget.data(),status.size())) {
       return givedripstatus(origin,outdata);
       } 
+constexpr const std::string_view dashboard="dashboard";
+   if(!memcmp(dashboard.data(),toget.data(),dashboard.size())) {
+      return givedashboard(outdata,hostname,secure);
+      }
 std::string_view index="index.html";
 const auto indexsize= index.size();
    if(toget.data()[0]==' '||!memcmp(index.data(),toget.data(),indexsize)) {
