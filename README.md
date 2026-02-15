@@ -16,7 +16,7 @@ Juggluco reads glucose data from Freestyle Libre 3 and 3+ sensors using a combin
 
 3. **Libreview Integration** (optional): For Libre 3 sensors activated by Abbott's app, Juggluco can retrieve the necessary cryptographic credentials from Abbott's Libreview cloud service using the same account credentials. This allows Juggluco to take over an already-active sensor without re-scanning.
 
-The sensor data includes the raw glucose value, trend/rate information, and alarm flags indicating high or low glucose conditions. Juggluco processes these readings through calibration algorithms to produce the final glucose display values.
+The sensor data includes the raw glucose value and trend/rate information. Juggluco applies its own processing and user-configured high and low glucose thresholds to generate alarm conditions and produce the final glucose display values.
 
 ## Web Server & Remote Viewing
 
@@ -40,11 +40,13 @@ The web server also provides Nightscout-compatible API endpoints for integration
 ### Setup
 
 1. In Juggluco, go to left menu → Settings → enable the web server
-2. Note the port number (default: 17580 for HTTP)
+2. Note the HTTP port number (default: 17580). If you enable HTTPS, it will use the HTTPS port you configure manually; there is no built-in default HTTPS port.
 3. Make sure your phone and computer are on the same network
 4. Open `http://<phone-ip>:17580/dashboard` in your browser
 
-For remote access outside your local network, you can configure SSL/HTTPS with your own certificates or use Juggluco's Nightscout upload feature to push data to a Nightscout server accessible from anywhere.
+> **Security note**: The web server is accessible to any device on your local network. Since medical data is involved, consider enabling password protection for the web server, and use HTTPS with your own certificates for encrypted connections.
+
+For remote access outside your local network, you can configure SSL/HTTPS with your own certificates or use Juggluco's Nightscout upload feature to push data to a Nightscout server accessible from anywhere. When using HTTPS, open `https://<phone-ip>:<https-port>/dashboard`, replacing `<https-port>` with the HTTPS port you configured.
 
 ## Alarm Synchronization
 

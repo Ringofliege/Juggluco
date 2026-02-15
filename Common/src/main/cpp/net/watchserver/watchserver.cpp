@@ -810,7 +810,7 @@ td{padding:8px;border-bottom:1px solid #0f3460}
 <div class="refresh-note" id="upd"></div>
 <script>
 var apiBase=location.protocol+'//'+location.host;
-function dirArrow(d){var m={'SingleUp':'\u2191\u2191','DoubleUp':'\u2191\u2191','SingleDown':'\u2193\u2193','DoubleDown':'\u2193\u2193','FortyFiveUp':'\u2197','FortyFiveDown':'\u2198','Flat':'\u2192','NOT COMPUTABLE':'-','RATE OUT OF RANGE':'-'};return m[d]||d||'-'}
+function dirArrow(d){var m={'SingleUp':'\u2191','DoubleUp':'\u2191\u2191','SingleDown':'\u2193','DoubleDown':'\u2193\u2193','FortyFiveUp':'\u2197','FortyFiveDown':'\u2198','Flat':'\u2192','NOT COMPUTABLE':'-','RATE OUT OF RANGE':'-'};return m[d]||d||'-'}
 function cls(v){if(v<70)return'low';if(v<=180)return'normal';if(v<=250)return'high';return'very-high'}
 function ago(t){var s=Math.floor((Date.now()-t)/1000);if(s<60)return s+'s ago';if(s<3600)return Math.floor(s/60)+'m ago';return Math.floor(s/3600)+'h '+Math.floor((s%3600)/60)+'m ago'}
 function pad(n){return n<10?'0'+n:''+n}
@@ -825,7 +825,7 @@ var tb=document.getElementById('tb');tb.innerHTML='';
 for(var i=0;i<data.length;i++){var r=data[i],rv=r.sgv||r.glucose||0,rd=new Date(r.date||r.mills);
 var tr=document.createElement('tr');tr.innerHTML='<td>'+fmt(rd)+'</td><td class="'+cls(rv)+'">'+rv+'</td><td>'+dirArrow(r.direction)+'</td>';tb.appendChild(tr)}
 document.getElementById('upd').textContent='Updated: '+new Date().toLocaleTimeString()
-}).catch(function(err){document.getElementById('gv').textContent='Error';document.getElementById('ta').textContent=err.message})}
+}).catch(function(err){document.getElementById('gv').textContent='Connection Error';document.getElementById('ta').textContent=(err.message||'')+' Check that the web server is enabled in Juggluco and that this device is on the same network.'})}
 load();setInterval(load,60000);
 </script>)";
     return mkhtml(outdata,"*"sv,std::string_view(dashhead,sizeof(dashhead)-1),std::string_view(dashbody,sizeof(dashbody)-1),true);

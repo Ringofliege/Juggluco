@@ -29,16 +29,24 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import static tk.glucodata.Log.doLog;
+import static tk.glucodata.Natives.getisalarm;
 
 public class LockScreenAlarmActivity extends Activity {
     private static final String LOG_ID = "LockScreenAlarm";
     static final String EXTRA_GLUCOSE_VALUE = "glucose_value";
     static final String EXTRA_GLUCOSE_ARROW = "glucose_arrow";
     static final String EXTRA_ALARM_MESSAGE = "alarm_message";
+    private boolean alarmStopped = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (!getisalarm()) {
+            {if(doLog) {Log.i(LOG_ID,"alarm already dismissed, finishing");};};
+            finish();
+            return;
+        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
             setShowWhenLocked(true);
@@ -69,6 +77,7 @@ public class LockScreenAlarmActivity extends Activity {
 
         if (glucoseValue != null) {
             valueView.setText(glucoseValue);
+            valueView.setContentDescription(glucoseValue + " " + Notify.unitlabel);
         }
         if (glucoseArrow != null) {
             arrowView.setText(glucoseArrow);
@@ -78,9 +87,29 @@ public class LockScreenAlarmActivity extends Activity {
         }
 
         stopButton.setOnClickListener(v -> {
-            {if(doLog) {Log.i(LOG_ID,"Stop Alarm from lock screen");};};
-            Notify.stopalarm();
-            finish();
+            stopAlarmAndDismiss();
         });
+    }
+
+    private void stopAlarmAndDismiss() {
+        {if(doLog) {Log.i(LOG_ID,"Stop Alarm from lock screen");};};
+        alarmStopped = true;
+        Notify.stopalarm();
+        finish();
+    }
+
+    @Override
+    public void onBackPressed() {
+        {if(doLog) {Log.i(LOG_ID,"Back pressed on lock screen alarm");};};
+        stopAlarmAndDismiss();
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (!alarmStopped && getisalarm()) {
+            {if(doLog) {Log.i(LOG_ID,"Lock screen alarm activity destroyed, stopping alarm");};};
+            Notify.stopalarm();
+        }
+        super.onDestroy();
     }
 }

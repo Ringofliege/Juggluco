@@ -28,14 +28,16 @@
             android:layout_height="wrap_content"
             android:textColor="#FF4444"
             android:textSize="72sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:importantForAccessibility="yes" />
 
         <TextView
             android:id="@+id/lockscreen_glucose_arrow"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="#FFFFFF"
-            android:textSize="48sp" />
+            android:textSize="48sp"
+            android:importantForAccessibility="yes" />
 
         <TextView
             android:id="@+id/lockscreen_alarm_message"
@@ -44,7 +46,8 @@
             android:textColor="#FFAA00"
             android:textSize="20sp"
             android:layout_marginTop="8dp"
-            android:layout_marginBottom="24dp" />
+            android:layout_marginBottom="24dp"
+            android:importantForAccessibility="yes" />
 
         <Button
             android:id="@+id/lockscreen_stop_alarm"
@@ -55,7 +58,8 @@
             android:paddingStart="48dp"
             android:paddingEnd="48dp"
             android:paddingTop="16dp"
-            android:paddingBottom="16dp" />
+            android:paddingBottom="16dp"
+            android:contentDescription="@string/shortoff" />
 
     </LinearLayout>
 

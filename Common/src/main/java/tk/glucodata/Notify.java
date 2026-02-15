@@ -793,7 +793,8 @@ private PendingIntent mkLockScreenAlarmIntent(String glucoseValue, float rate, S
     lockIntent.putExtra(LockScreenAlarmActivity.EXTRA_GLUCOSE_ARROW, rateToArrow(rate));
     lockIntent.putExtra(LockScreenAlarmActivity.EXTRA_ALARM_MESSAGE, alarmMessage);
     lockIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-    return PendingIntent.getActivity(Applic.app, 1, lockIntent, PendingIntent.FLAG_UPDATE_CURRENT | penmutable);
+    int requestCode = (int) System.currentTimeMillis();
+    return PendingIntent.getActivity(Applic.app, requestCode, lockIntent, PendingIntent.FLAG_UPDATE_CURRENT | penmutable);
 }
 private void  makeseparatenotification(float glvalue,String message,notGlucose glucose,String type) {
     if(!isWearable) {
